@@ -6,11 +6,11 @@ import os
 import shutil
 import json
 
-from env.Lib.pathlib import Path
+from pathlib import Path
 from src.constant import *
 from src.exception import CustomException
 from src.logger import logging
-from src.utils.main_utils import ManiUtils
+from src.utils.main_utils import MainUtils
 from dataclasses import dataclass
 
 LENGTH_OF_DATE_STAMP_IN_FILE = 8
@@ -24,15 +24,17 @@ class DataValidationConfig:
     valid_data_dir: str = os.path.join(data_validation_dir, 'validated')
     invalid_data_dir: str = os.path.join(data_validation_dir, 'invalid')
     schema_config_file_path: str = os.path.join('config', 'training_schema.json')
-    
+
 
 class DataValidation:
-    def __init__(self, raw_data_store_dir: Path):
+    def __init__(self,
+                 raw_data_store_dir: Path):
+
         self.raw_data_store_dir = raw_data_store_dir
         self.data_validation_config = DataValidationConfig()
-        
-        self.utils = ManiUtils()
-        
+
+        self.utils = MainUtils()
+
     def valuesFromSchema(self):
         """
                         Method Name: valuesFromSchema
@@ -40,16 +42,14 @@ class DataValidation:
                         Output: LengthOfDateStampInFile, LengthOfTimeStampInFile, column_names, Number of Columns
                         On Failure: Raise ValueError,KeyError,Exception
 
-                         Written By: iNeuron Intelligence
                         Version: 1.0
                         Revisions: None
 
                                 """
-                                
         try:
             with open(self.data_validation_config.schema_config_file_path, 'r') as f:
                 dic = json.load(f)
-            
+                f.close()
             LengthOfDateStampInFile = dic['LengthOfDateStampInFile']
             LengthOfTimeStampInFile = dic['LengthOfTimeStampInFile']
             column_names = dic['ColName']
@@ -59,9 +59,7 @@ class DataValidation:
 
         except Exception as e:
             raise CustomException(e, sys)
-        
-    
-        
+
     def validate_file_name(self,
                            file_path: str,
                            length_of_date_stamp: int,
@@ -80,6 +78,10 @@ class DataValidation:
 
             file_name = os.path.basename(file_path)
             regex = "['phising']+['\_'']+[\d_]+[\d]+\.csv"
+            # regex = r'^Phishing_\d{8}_\d{6}\.csv$'
+
+            logging.info(f"Filename: {file_name}")
+            logging.info(f"regex:{regex}")
 
             if re.match(regex, file_name):
                 splitAtDot = re.split('.csv', file_name)
@@ -88,13 +90,13 @@ class DataValidation:
                     splitAtDot[2]) == length_of_time_stamp
             else:
                 filename_validation_status = False
+                logging.info("FILE NAME STATUS FALSE")
 
             return filename_validation_status
 
         except Exception as e:
             raise CustomException(e, sys)
-        
-        
+
     def validate_no_of_columns(self, file_path: str,
                                schema_no_of_columns: int) -> bool:
         """

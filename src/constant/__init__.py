@@ -2,7 +2,7 @@ from datetime import datetime
 
 import os
 
-AWS_S3_BUCKET_NAME = "sensor-deployment"
+AWS_S3_BUCKET_NAME = "sensorpw"
 MONGO_DATABASE_NAME = "phising"
 
 TARGET_COLUMN = "Result"

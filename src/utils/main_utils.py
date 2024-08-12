@@ -12,7 +12,7 @@ from src.constant import *
 from src.exception import CustomException
 from src.logger import logging
 
-class ManiUtils:
+class MainUtils:
     def __init__(self)-> None:
         pass
     
